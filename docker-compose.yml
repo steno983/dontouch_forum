@@ -1,0 +1,36 @@
+version: '3.3'
+services:
+    db:
+        container_name: dontouch_db
+        image: mysql:8.0
+        command: --default-authentication-plugin=mysql_native_password
+        environment:
+            MYSQL_DATABASE: dontouch
+            MYSQL_USER: dontouch_user
+            MYSQL_PASSWORD: password
+            MYSQL_ROOT_PASSWORD: root_password
+        volumes:
+            - db_data:/var/lib/mysql
+    app:
+        container_name: dontouch_forum
+        build:
+            context: .
+            dockerfile: Dockerfile
+        volumes:
+            - ./:/var/www/html
+        depends_on:
+            - db
+    nginx:
+        container_name: dontouch_nginx
+        build:
+            context: .docker/nginx
+            dockerfile: Dockerfile
+        volumes:
+            - ./:/var/www/html
+        ports:
+            - '8000:80'
+        depends_on:
+            - app
+volumes:
+    db_data:
+
